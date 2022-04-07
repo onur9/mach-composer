@@ -117,5 +117,7 @@ jobs:
           context: .
           push: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          build-args: TERRAFORM_VERSION=0.14.5
+          build-args:
+            TERRAFORM_VERSION=0.14.5
+            GORELEASER_ARGS=--snapshot
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.prep.outputs.version }}-tf0

@@ -1,8 +1,9 @@
 FROM goreleaser/goreleaser:v1.7.0 AS builder
+ARG GORELEASER_ARGS
 
 COPY . /code/
 WORKDIR /code/
-RUN goreleaser build --single-target --skip-validate
+RUN goreleaser build --single-target --skip-validate ${GORELEASER_ARGS}
 
 FROM alpine:3.14
 
