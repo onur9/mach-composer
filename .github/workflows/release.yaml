@@ -37,7 +37,6 @@ jobs:
 
 
   docker:
-    if: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
     needs: [goreleaser]
     name: Build and push docker image
     runs-on: ubuntu-latest
@@ -87,7 +86,6 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
 
   docker-tf0:
-    if: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' }}
     needs: [goreleaser]
     name: Build and push docker image (terraform 0.14)
     runs-on: ubuntu-latest
