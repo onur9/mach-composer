@@ -2,6 +2,8 @@ name: Create release
 
 on:
   push:
+    branches:
+      - 'pipelines/**'
     tags:
       - 'v*'
 
@@ -112,8 +114,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
-
           github-token: ${{ secrets.GITHUB_TOKEN }}
           build-args: TERRAFORM_VERSION=0.14.5
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.prep.outputs.version }}-tf0
