@@ -3,7 +3,7 @@ package updater
 import (
 	"testing"
 
-	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/labd/mach-composer/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,21 +30,21 @@ func TestMachConfigUpdater(t *testing.T) {
 		filename: "foo.yml",
 		updates: []ChangeSet{
 			{
-				Component: &config.Component{
+				Component: &model.Component{
 					Name:    "your-component",
 					Version: "0.1.0",
 				},
 				LastVersion: "new-version",
 			},
 			{
-				Component: &config.Component{
+				Component: &model.Component{
 					Name:    "foobar",
 					Version: "version",
 				},
 				LastVersion: "quoted",
 			},
 			{
-				Component: &config.Component{
+				Component: &model.Component{
 					Name:    "errror",
 					Version: "not-in-file",
 				},
