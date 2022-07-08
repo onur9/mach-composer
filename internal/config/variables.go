@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -61,7 +62,7 @@ func (v *Variables) Set(key string, value string) {
 	v.vars[key] = value
 }
 
-func loadVariables(filename string) (*Variables, error) {
+func loadVariables(ctx context.Context, filename string) (*Variables, error) {
 	body, err := utils.AFS.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -72,7 +73,7 @@ func loadVariables(filename string) (*Variables, error) {
 
 	if yamlIsEncrypted(body) {
 		logrus.Debug("Detected SOPS encryption; decrypting...")
-		body, err = decryptYAML(filename)
+		body, err = decryptYAML(ctx, filename)
 		if err != nil {
 			panic(err)
 		}

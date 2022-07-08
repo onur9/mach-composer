@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/labd/mach-composer/internal/generator"
@@ -15,7 +16,7 @@ var terraformCmd = &cobra.Command{
 		preprocessGenerateFlags()
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := terraformFunc(args); err != nil {
+		if err := terraformFunc(context.Background(), args); err != nil {
 			return err
 		}
 		return nil
@@ -29,9 +30,9 @@ func init() {
 	}
 }
 
-func terraformFunc(args []string) error {
+func terraformFunc(ctx context.Context, args []string) error {
 	allPaths := make(map[string]map[string]string)
-	configs := LoadConfigs()
+	configs := LoadConfigs(ctx)
 
 	generateFlags.ValidateSite(configs)
 

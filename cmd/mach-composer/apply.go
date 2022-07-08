@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/labd/mach-composer/internal/generator"
 	"github.com/labd/mach-composer/internal/runner"
 	"github.com/spf13/cobra"
@@ -21,7 +23,7 @@ var applyCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := applyFunc(args); err != nil {
+		if err := applyFunc(context.Background(), args); err != nil {
 			return err
 		}
 		return nil
@@ -36,9 +38,9 @@ func init() {
 	applyCmd.Flags().StringArrayVarP(&applyFlags.components, "component", "c", []string{}, "")
 }
 
-func applyFunc(args []string) error {
+func applyFunc(ctx context.Context, args []string) error {
 	allPaths := make(map[string]map[string]string)
-	configs := LoadConfigs()
+	configs := LoadConfigs(ctx)
 
 	generateFlags.ValidateSite(configs)
 

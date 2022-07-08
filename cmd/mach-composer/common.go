@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -72,10 +73,10 @@ func preprocessGenerateFlags() {
 
 // LoadConfigs loads all config files. This means it validates and parses
 // the yaml file.
-func LoadConfigs() map[string]*config.Config {
+func LoadConfigs(ctx context.Context) map[string]*config.Config {
 	configs := make(map[string]*config.Config)
 	for _, filename := range generateFlags.fileNames {
-		cfg, err := config.Load(filename, generateFlags.varFile)
+		cfg, err := config.Load(ctx, filename, generateFlags.varFile)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/labd/mach-composer/internal/generator"
 	"github.com/labd/mach-composer/internal/runner"
 	"github.com/spf13/cobra"
@@ -19,7 +21,7 @@ var planCmd = &cobra.Command{
 	},
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := planFunc(args); err != nil {
+		if err := planFunc(context.Background(), args); err != nil {
 			return err
 		}
 		return nil
@@ -32,8 +34,8 @@ func init() {
 	planCmd.Flags().StringArrayVarP(&planFlags.components, "component", "c", []string{}, "")
 }
 
-func planFunc(args []string) error {
-	configs := LoadConfigs()
+func planFunc(ctx context.Context, args []string) error {
+	configs := LoadConfigs(ctx)
 	allPaths := make(map[string]map[string]string)
 
 	// Write the generate files for each config

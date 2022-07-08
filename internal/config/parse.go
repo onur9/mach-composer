@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -12,11 +13,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Load(filename string, varFilename string) (*Config, error) {
+func Load(ctx context.Context, filename string, varFilename string) (*Config, error) {
 	var vars *Variables
 	if varFilename != "" {
 		var err error
-		vars, err = loadVariables(varFilename)
+		vars, err = loadVariables(ctx, varFilename)
 		if err != nil {
 			panic(err)
 		}
@@ -36,7 +37,7 @@ func Load(filename string, varFilename string) (*Config, error) {
 		return nil, fmt.Errorf("failed to load config %s due to errors", filename)
 	}
 
-	cfg, err := Parse(body, vars)
+	cfg, err := Parse(ctx, body, vars)
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +58,7 @@ func GetSchemaVersion(data []byte) (int, error) {
 		MACHComposer MACHComposer `yaml:"mach_composer"`
 	}
 
-	// decode YAML in an intermediate config file
+	// decode YAML in an intermediate config file.
 	intermediate := &PartialMachConfig{}
 	err := yaml.Unmarshal(data, intermediate)
 	if err != nil {
@@ -77,7 +78,7 @@ func GetSchemaVersion(data []byte) (int, error) {
 	return 0, errors.New("no valid version identifier found")
 }
 
-func Parse(data []byte, vars *Variables) (*Config, error) {
+func Parse(ctx context.Context, data []byte, vars *Variables) (*Config, error) {
 	// decode YAML in an intermediate config file
 	intermediate := &RawConfig{}
 	err := yaml.Unmarshal(data, intermediate)
@@ -86,7 +87,7 @@ func Parse(data []byte, vars *Variables) (*Config, error) {
 	}
 
 	if vars == nil && intermediate.MACHComposer.VariablesFile != "" {
-		vars, err = loadVariables(intermediate.MACHComposer.VariablesFile)
+		vars, err = loadVariables(ctx, intermediate.MACHComposer.VariablesFile)
 		if err != nil {
 			panic(err)
 		}

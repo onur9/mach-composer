@@ -17,7 +17,7 @@ type WorkerJob struct {
 }
 
 func UpdateFile(ctx context.Context, filename, componentName, componentVersion string, writeChanges bool) (*UpdateSet, error) {
-	cfg, err := config.Load(filename, "")
+	cfg, err := config.Load(ctx, filename, "")
 	if err != nil {
 		return nil, err
 	}
