@@ -26,7 +26,7 @@ func (c *Config) HasSite(id string) bool {
 	return false
 }
 
-type _RawMachConfig struct {
+type RawConfig struct {
 	Filename     string
 	MachComposer MachComposer `yaml:"mach_composer"`
 	Global       Global       `yaml:"global"`
