@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Filename     string
-	MachComposer MachComposer `yaml:"mach_composer"`
+	MACHComposer MACHComposer `yaml:"mach_composer"`
 	Global       Global       `yaml:"global"`
 	Sites        []Site       `yaml:"sites"`
 	Components   []Component  `yaml:"components"`
@@ -28,14 +28,14 @@ func (c *Config) HasSite(id string) bool {
 
 type RawConfig struct {
 	Filename     string
-	MachComposer MachComposer `yaml:"mach_composer"`
+	MACHComposer MACHComposer `yaml:"mach_composer"`
 	Global       Global       `yaml:"global"`
 	Sites        yaml.Node    `yaml:"sites"`
 	Components   yaml.Node    `yaml:"components"`
 	Sops         yaml.Node    `yaml:"sops"`
 }
 
-type MachComposer struct {
+type MACHComposer struct {
 	Version       string
 	VariablesFile string `yaml:"variables_file"`
 }

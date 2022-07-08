@@ -53,7 +53,7 @@ func Load(filename string, varFilename string) (*Config, error) {
 
 func GetSchemaVersion(data []byte) (int, error) {
 	type PartialMachConfig struct {
-		MachComposer MachComposer `yaml:"mach_composer"`
+		MACHComposer MACHComposer `yaml:"mach_composer"`
 	}
 
 	// decode YAML in an intermediate config file
@@ -63,7 +63,7 @@ func GetSchemaVersion(data []byte) (int, error) {
 		return 0, err
 	}
 
-	v := intermediate.MachComposer.Version
+	v := intermediate.MACHComposer.Version
 	if val, err := strconv.Atoi(v); err == nil {
 		return val, err
 	}
@@ -84,8 +84,8 @@ func Parse(data []byte, vars *Variables) (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshall yaml: %w", err)
 	}
 
-	if vars == nil && intermediate.MachComposer.VariablesFile != "" {
-		vars, err = loadVariables(intermediate.MachComposer.VariablesFile)
+	if vars == nil && intermediate.MACHComposer.VariablesFile != "" {
+		vars, err = loadVariables(intermediate.MACHComposer.VariablesFile)
 		if err != nil {
 			panic(err)
 		}
@@ -102,7 +102,7 @@ func Parse(data []byte, vars *Variables) (*Config, error) {
 
 	cfg := &Config{
 		Filename:     intermediate.Filename,
-		MachComposer: intermediate.MachComposer,
+		MACHComposer: intermediate.MACHComposer,
 		Global:       intermediate.Global,
 	}
 
