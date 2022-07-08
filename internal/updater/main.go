@@ -12,7 +12,7 @@ import (
 
 type WorkerJob struct {
 	component *config.Component
-	cfg       *config.MachConfig
+	cfg       *config.Config
 }
 
 func UpdateFile(ctx context.Context, filename, componentName, componentVersion string, writeChanges bool) (*UpdateSet, error) {
@@ -77,7 +77,7 @@ func UpdateFile(ctx context.Context, filename, componentName, componentVersion s
 	return updateSet, nil
 }
 
-func FindUpdates(ctx context.Context, cfg *config.MachConfig, filename string, component *config.Component) *UpdateSet {
+func FindUpdates(ctx context.Context, cfg *config.Config, filename string, component *config.Component) *UpdateSet {
 	numUpdates := len(cfg.Components)
 	jobs := make(chan WorkerJob, numUpdates)
 	results := make(chan *ChangeSet, numUpdates)
@@ -125,7 +125,7 @@ func FindUpdates(ctx context.Context, cfg *config.MachConfig, filename string, c
 	return &updates
 }
 
-func FindSpecificUpdate(ctx context.Context, cfg *config.MachConfig, filename string, component *config.Component) *UpdateSet {
+func FindSpecificUpdate(ctx context.Context, cfg *config.Config, filename string, component *config.Component) *UpdateSet {
 	changeSet, err := GetLastVersion(ctx, component, cfg.Filename)
 	if err != nil {
 		panic(err)
@@ -148,7 +148,7 @@ func GetLastVersion(ctx context.Context, c *config.Component, origin string) (*C
 	return nil, errors.New("unrecognized component source")
 }
 
-func WriteUpdates(ctx context.Context, cfg *config.MachConfig, updates *UpdateSet) {
+func WriteUpdates(ctx context.Context, cfg *config.Config, updates *UpdateSet) {
 	if cfg.IsEncrypted {
 		SopsFileWriter(cfg, updates)
 	} else {

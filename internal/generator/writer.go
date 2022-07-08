@@ -19,7 +19,7 @@ type GenerateOptions struct {
 	Site       string
 }
 
-func FileLocations(cfg *config.MachConfig, options *GenerateOptions) map[string]string {
+func FileLocations(cfg *config.Config, options *GenerateOptions) map[string]string {
 	path := strings.TrimSuffix(filepath.Base(cfg.Filename), filepath.Ext(cfg.Filename))
 	sitesPath := filepath.Join(options.OutputPath, path)
 
@@ -32,7 +32,7 @@ func FileLocations(cfg *config.MachConfig, options *GenerateOptions) map[string]
 	return locations
 }
 
-func WriteFiles(cfg *config.MachConfig, options *GenerateOptions) (map[string]string, error) {
+func WriteFiles(cfg *config.Config, options *GenerateOptions) (map[string]string, error) {
 	locations := FileLocations(cfg, options)
 	for i := range cfg.Sites {
 		site := cfg.Sites[i]

@@ -20,7 +20,7 @@ type GenerateFlags struct {
 
 var generateFlags GenerateFlags
 
-func (gf GenerateFlags) ValidateSite(configs map[string]*config.MachConfig) {
+func (gf GenerateFlags) ValidateSite(configs map[string]*config.Config) {
 	for _, filename := range generateFlags.fileNames {
 		cfg := configs[filename]
 		if gf.siteName != "" && !cfg.HasSite(gf.siteName) {
@@ -72,8 +72,8 @@ func preprocessGenerateFlags() {
 
 // LoadConfigs loads all config files. This means it validates and parses
 // the yaml file.
-func LoadConfigs() map[string]*config.MachConfig {
-	configs := make(map[string]*config.MachConfig)
+func LoadConfigs() map[string]*config.Config {
+	configs := make(map[string]*config.Config)
 	for _, filename := range generateFlags.fileNames {
 		cfg, err := config.Load(filename, generateFlags.varFile)
 		if err != nil {
@@ -87,7 +87,7 @@ func LoadConfigs() map[string]*config.MachConfig {
 }
 
 // CheckDeprecations warns if features have been deprecated
-func CheckDeprecations(cfg *config.MachConfig) {
+func CheckDeprecations(cfg *config.Config) {
 	for _, site := range cfg.Sites {
 		if site.Commercetools != nil && site.Commercetools.Frontend != nil {
 			fmt.Println("[WARN] Site", site.Identifier, "commercetools frontend block is deprecated and will be removed soon")

@@ -17,7 +17,7 @@ type ApplyOptions struct {
 	Site        string
 }
 
-func TerraformApply(cfg *config.MachConfig, locations map[string]string, options *ApplyOptions) {
+func TerraformApply(cfg *config.Config, locations map[string]string, options *ApplyOptions) {
 	ctx := context.Background()
 
 	for i := range cfg.Sites {
@@ -31,7 +31,7 @@ func TerraformApply(cfg *config.MachConfig, locations map[string]string, options
 	}
 }
 
-func TerraformProxy(cfg *config.MachConfig, locations map[string]string, siteName string, cmd []string) {
+func TerraformProxy(cfg *config.Config, locations map[string]string, siteName string, cmd []string) {
 	ctx := context.Background()
 
 	for i := range cfg.Sites {
@@ -45,7 +45,7 @@ func TerraformProxy(cfg *config.MachConfig, locations map[string]string, siteNam
 	}
 }
 
-func TerraformApplySite(ctx context.Context, cfg *config.MachConfig, site *config.Site, path string, options *ApplyOptions) {
+func TerraformApplySite(ctx context.Context, cfg *config.Config, site *config.Site, path string, options *ApplyOptions) {
 	if !options.Reuse {
 		RunTerraform(ctx, path, "init")
 	}

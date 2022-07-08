@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Process(cfg *MachConfig) {
+func Process(cfg *Config) {
 	// resolve_variables(config, config.variables, config.variables_encrypted)
 	// parse_global_config(config)
 	// resolve_component_definitions(config)
@@ -17,13 +17,13 @@ func Process(cfg *MachConfig) {
 
 }
 
-func ResolveComponentDefinitions(cfg *MachConfig) {
+func ResolveComponentDefinitions(cfg *Config) {
 	for i := range cfg.Components {
 		ResolveComponentDefinition(&cfg.Components[i], cfg)
 	}
 }
 
-func ResolveComponentDefinition(c *Component, cfg *MachConfig) *Component {
+func ResolveComponentDefinition(c *Component, cfg *Config) *Component {
 	// Terraform needs absolute paths to modules
 	if strings.HasPrefix(c.Source, ".") {
 		if val, err := filepath.Abs(c.Source); err == nil {
@@ -53,7 +53,7 @@ func ResolveComponentDefinition(c *Component, cfg *MachConfig) *Component {
 	return c
 }
 
-func ResolveSiteConfigs(cfg *MachConfig) {
+func ResolveSiteConfigs(cfg *Config) {
 	ResolveAzureConfig(cfg)
 	ResolveSentryConfig(cfg)
 	ResolveSiteComponents(cfg)
@@ -63,7 +63,7 @@ func ResolveSiteConfigs(cfg *MachConfig) {
 	}
 }
 
-func ResolveSiteComponents(cfg *MachConfig) {
+func ResolveSiteComponents(cfg *Config) {
 	components := make(map[string]*Component, len(cfg.Components))
 	for i, c := range cfg.Components {
 		components[c.Name] = &cfg.Components[i]
@@ -94,7 +94,7 @@ func ResolveSiteComponents(cfg *MachConfig) {
 	}
 }
 
-func ResolveSentryConfig(cfg *MachConfig) {
+func ResolveSentryConfig(cfg *Config) {
 	if cfg.Global.SentryConfig != nil {
 		for i := range cfg.Sites {
 			s := &cfg.Sites[i]
@@ -107,7 +107,7 @@ func ResolveSentryConfig(cfg *MachConfig) {
 	}
 }
 
-func ResolveAzureConfig(cfg *MachConfig) {
+func ResolveAzureConfig(cfg *Config) {
 	if cfg.Global.Cloud != "azure" {
 		return
 	}

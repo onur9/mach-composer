@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type MachConfig struct {
+type Config struct {
 	Filename     string
 	MachComposer MachComposer `yaml:"mach_composer"`
 	Global       Global       `yaml:"global"`
@@ -17,9 +17,9 @@ type MachConfig struct {
 	IsEncrypted bool
 }
 
-func (c *MachConfig) HasSite(ident string) bool {
+func (c *Config) HasSite(id string) bool {
 	for i := range c.Sites {
-		if c.Sites[i].Identifier == ident {
+		if c.Sites[i].Identifier == id {
 			return true
 		}
 	}

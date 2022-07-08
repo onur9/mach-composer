@@ -14,7 +14,7 @@ type PlanOptions struct {
 	Site       string
 }
 
-func TerraformPlan(cfg *config.MachConfig, locations map[string]string, options *PlanOptions) {
+func TerraformPlan(cfg *config.Config, locations map[string]string, options *PlanOptions) {
 	ctx := context.Background()
 
 	for i := range cfg.Sites {
@@ -28,7 +28,7 @@ func TerraformPlan(cfg *config.MachConfig, locations map[string]string, options 
 	}
 }
 
-func TerraformPlanSite(ctx context.Context, cfg *config.MachConfig, site *config.Site, path string, options *PlanOptions) {
+func TerraformPlanSite(ctx context.Context, cfg *config.Config, site *config.Site, path string, options *PlanOptions) {
 	logrus.Debugf("Running terraform plan for site %s", site.Identifier)
 
 	if !options.Reuse {

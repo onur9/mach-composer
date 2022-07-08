@@ -73,7 +73,7 @@ func TestParse(t *testing.T) {
 		t.Error(err)
 	}
 
-	expected := &MachConfig{
+	expected := &Config{
 		MachComposer: MachComposer{
 			Version: "1.0.0",
 		},

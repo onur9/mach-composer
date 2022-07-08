@@ -11,7 +11,7 @@ import (
 
 // SopsFileWriter updates the contents of a mach file with the updated
 // version of the components
-func SopsFileWriter(cfg *config.MachConfig, updates *UpdateSet) {
+func SopsFileWriter(cfg *config.Config, updates *UpdateSet) {
 	indexMap := make(map[string]int)
 
 	for i := range cfg.Components {

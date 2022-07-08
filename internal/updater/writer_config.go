@@ -10,12 +10,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type MachConfig struct {
+type Config struct {
 	Components yaml.Node
 }
 
 func MachConfigUpdater(src []byte, updateSet *UpdateSet) []byte {
-	data := MachConfig{}
+	data := Config{}
 	err := yaml.Unmarshal(src, &data)
 	if err != nil {
 		log.Fatalln(err)

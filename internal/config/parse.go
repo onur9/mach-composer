@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Load(filename string, varFilename string) (*MachConfig, error) {
+func Load(filename string, varFilename string) (*Config, error) {
 	var vars *Variables
 	if varFilename != "" {
 		var err error
@@ -52,7 +52,6 @@ func Load(filename string, varFilename string) (*MachConfig, error) {
 }
 
 func GetSchemaVersion(data []byte) (int, error) {
-
 	type PartialMachConfig struct {
 		MachComposer MachComposer `yaml:"mach_composer"`
 	}
@@ -77,10 +76,9 @@ func GetSchemaVersion(data []byte) (int, error) {
 	return 0, errors.New("no valid version identifier found")
 }
 
-func Parse(data []byte, vars *Variables) (*MachConfig, error) {
-
+func Parse(data []byte, vars *Variables) (*Config, error) {
 	// Decode the yaml in an intermediate config file
-	intermediate := &_RawMachConfig{}
+	intermediate := &RawConfig{}
 	err := yaml.Unmarshal(data, intermediate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshall yaml: %w", err)
@@ -102,7 +100,7 @@ func Parse(data []byte, vars *Variables) (*MachConfig, error) {
 		return nil, varErr
 	}
 
-	cfg := &MachConfig{
+	cfg := &Config{
 		Filename:     intermediate.Filename,
 		MachComposer: intermediate.MachComposer,
 		Global:       intermediate.Global,
