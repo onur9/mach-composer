@@ -22,7 +22,7 @@ func MachConfigUpdater(src []byte, updateSet *UpdateSet) []byte {
 	}
 
 	// Create a mapping where the key is the component name and the value the
-	// yaml node of the component. We do this by iterating all component children
+	// YAML node of the component. We do this by iterating all component children
 	// and searching for the `name` tag.
 	nodes := map[string]*yaml.Node{}
 	for _, cn := range data.Components.Content {
@@ -35,7 +35,7 @@ func MachConfigUpdater(src []byte, updateSet *UpdateSet) []byte {
 		}
 	}
 
-	// Walk through the updated components and search the corresponding yaml node
+	// Walk through the updated components and search the corresponding YAML node
 	// via the previously created mapping. Withing the node search for the
 	// `version` tag and use the line number to change the value in the source
 	// document (lines list)
@@ -43,7 +43,7 @@ func MachConfigUpdater(src []byte, updateSet *UpdateSet) []byte {
 	for _, c := range updateSet.updates {
 		node, ok := nodes[c.Component.Name]
 		if !ok {
-			logrus.Warn("Component with update not found in yaml file")
+			logrus.Warn("Component with update not found in YAML file")
 			continue
 		}
 

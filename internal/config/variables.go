@@ -71,7 +71,7 @@ func loadVariables(filename string) (*Variables, error) {
 
 	if yamlIsEncrypted(body) {
 		logrus.Debug("Detected SOPS encryption; decrypting...")
-		body, err = DecryptYaml(filename)
+		body, err = DecryptYAML(filename)
 		if err != nil {
 			panic(err)
 		}

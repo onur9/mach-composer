@@ -56,7 +56,7 @@ func GetSchemaVersion(data []byte) (int, error) {
 		MachComposer MachComposer `yaml:"mach_composer"`
 	}
 
-	// Decode the yaml in an intermediate config file
+	// decode YAML in an intermediate config file
 	intermediate := &PartialMachConfig{}
 	err := yaml.Unmarshal(data, intermediate)
 	if err != nil {
@@ -77,7 +77,7 @@ func GetSchemaVersion(data []byte) (int, error) {
 }
 
 func Parse(data []byte, vars *Variables) (*Config, error) {
-	// Decode the yaml in an intermediate config file
+	// decode YAML in an intermediate config file
 	intermediate := &RawConfig{}
 	err := yaml.Unmarshal(data, intermediate)
 	if err != nil {

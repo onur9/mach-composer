@@ -7,11 +7,11 @@ import (
 	"github.com/labd/mach-composer/internal/utils"
 )
 
-// DecryptYaml takes a filename and returns the decrypted yaml.
+// DecryptYAML takes a filename and returns the decrypted YAML.
 // This command directly calls the sops binary instead of using the
 // go.mozilla.org/sops/v3/decrypt package since that adds numerous dependencies
 // and adds ~19mb to the generated binary
-func DecryptYaml(filename string) ([]byte, error) {
+func DecryptYAML(filename string) ([]byte, error) {
 	ctx := context.Background()
 	wd, err := os.Getwd()
 	if err != nil {
