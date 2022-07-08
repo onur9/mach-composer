@@ -1,4 +1,4 @@
-package config
+package model
 
 type AmplienceConfig struct {
 	ClientID     string `yaml:"client_id"`

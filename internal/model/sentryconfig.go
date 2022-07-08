@@ -1,4 +1,4 @@
-package config
+package model
 
 // SentryConfigBase is the base sentry config.
 type SentryConfigBase struct {

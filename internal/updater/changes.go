@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 )
 
 type UpdateSet struct {
@@ -15,7 +15,7 @@ type UpdateSet struct {
 type ChangeSet struct {
 	LastVersion string
 	Changes     []gitCommit
-	Component   *config.Component
+	Component   *model.Component
 	Forced      bool
 }
 

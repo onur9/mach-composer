@@ -1,8 +1,10 @@
-package config
+package config_test
 
 import (
 	"testing"
 
+	. "github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/labd/mach-composer/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -80,14 +82,14 @@ func TestParse(t *testing.T) {
 		Global: Global{
 			Environment: "test",
 			Cloud:       "aws",
-			TerraformConfig: TerraformConfig{
-				AwsRemoteState: &AWSTFState{
+			TerraformConfig: model.TerraformConfig{
+				AwsRemoteState: &model.AWSTFState{
 					Bucket:    "your bucket",
 					KeyPrefix: "mach",
 				},
 			},
 		},
-		Sites: []Site{
+		Sites: []model.Site{
 			{
 				Name:       "",
 				Identifier: "my-site",
@@ -99,18 +101,18 @@ func TestParse(t *testing.T) {
 						"url":                    "internal-api.my-site.nl",
 					},
 				},
-				Commercetools: &CommercetoolsSettings{
+				Commercetools: &model.CommercetoolsSettings{
 					ProjectKey:   "my-site",
 					ClientID:     "<client-id>",
 					ClientSecret: "<client-secret>",
 					Scopes:       "manage_api_clients:my-site manage_project:my-site view_api_clients:my-site",
-					ProjectSettings: &CommercetoolsProjectSettings{
+					ProjectSettings: &model.CommercetoolsProjectSettings{
 						Languages:  []string{"en-GB", "nl-NL"},
 						Currencies: []string{"GBP", "EUR"},
 						Countries:  []string{"GB", "NL"},
 					},
 				},
-				Components: []SiteComponent{
+				Components: []model.SiteComponent{
 					{
 						Name: "your-component",
 						Variables: map[string]any{
@@ -123,13 +125,13 @@ func TestParse(t *testing.T) {
 						},
 					},
 				},
-				AWS: &SiteAWS{
+				AWS: &model.SiteAWS{
 					AccountID: "123456789",
 					Region:    "eu-central-1",
 				},
 			},
 		},
-		Components: []Component{
+		Components: []model.Component{
 			{
 				Name:         "your-component",
 				Source:       "git::https://github.com/<username>/<your-component>.git//terraform",

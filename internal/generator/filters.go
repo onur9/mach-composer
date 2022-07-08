@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/flosch/pongo2/v5"
-	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -105,12 +105,11 @@ func filterString(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2
 	return in, nil
 }
 
-// Take a component and a site-endpoint, and return a Terraform reference to
-// an output. The endpoint might have a different name in the component itself
-// based on the mappings
+// Take a component and a site endpoint and return a Terraform reference to an output.
+// The endpoint might have a different name in the component itself based on the mappings.
 func filterComponentEndpointName(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-	component := in.Interface().(config.SiteComponent)
-	endpoint := param.Interface().(config.Endpoint)
+	component := in.Interface().(model.SiteComponent)
+	endpoint := param.Interface().(model.Endpoint)
 	for componentKey, epKey := range component.Definition.Endpoints {
 		if epKey == endpoint.Key {
 			return pongo2.AsSafeValue(componentKey), nil
@@ -125,7 +124,7 @@ func filterComponentEndpointName(in *pongo2.Value, param *pongo2.Value) (*pongo2
 
 func filterTFValue(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 	if in.IsString() {
-		val, err := ParseTemplateVariable(in.String())
+		val, err := parseTemplateVariable(in.String())
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
@@ -235,4 +234,26 @@ func filterCommercetoolsScopes(in *pongo2.Value, param *pongo2.Value) (*pongo2.V
 
 	result := pongo2.AsSafeValue(fmt.Sprintf("[\n  %s\n]", strings.Join(sl, "")))
 	return result, nil
+}
+
+var templateVariableRegexp = regexp.MustCompile(`\${(component(?:\.[^\}]+)+)}`)
+
+func parseTemplateVariable(val string) (string, error) {
+	matches := templateVariableRegexp.FindAllStringSubmatch(val, 20)
+	if len(matches) == 0 {
+		return val, nil
+	}
+	for _, match := range matches {
+		parts := strings.SplitN(match[1], ".", 3)
+		if len(parts) < 3 {
+			return "", fmt.Errorf(
+				"invalid variable '%s'; "+
+					"When using a ${component...} variable it has to consist of 2 parts; "+
+					"component-name.output-name",
+				match[1])
+		}
+		replacement := fmt.Sprintf("${module.%s.%s}", parts[1], parts[2])
+		val = strings.ReplaceAll(val, match[0], replacement)
+	}
+	return val, nil
 }

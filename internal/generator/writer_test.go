@@ -4,12 +4,13 @@ import (
 	"testing"
 
 	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFileLocations(t *testing.T) {
 	cfg := &config.Config{
-		Sites: []config.Site{
+		Sites: []model.Site{
 			{
 				Identifier: "my-site",
 			},

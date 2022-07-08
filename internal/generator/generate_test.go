@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
+	"github.com/labd/mach-composer/internal/model/commercetools"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRender(t *testing.T) {
-
 	cfg := config.Config{
 		MACHComposer: config.MACHComposer{
 			Version: "1.0.0",
@@ -16,15 +17,15 @@ func TestRender(t *testing.T) {
 		Global: config.Global{
 			Environment: "test",
 			Cloud:       "aws",
-			TerraformConfig: config.TerraformConfig{
-				AwsRemoteState: &config.AWSTFState{
+			TerraformConfig: model.TerraformConfig{
+				AwsRemoteState: &model.AWSTFState{
 					Bucket:    "your bucket",
 					KeyPrefix: "mach",
 					Region:    "eu-central-1",
 				},
 			},
 		},
-		Sites: []config.Site{
+		Sites: []model.Site{
 			{
 				Name:       "",
 				Identifier: "my-site",
@@ -36,18 +37,18 @@ func TestRender(t *testing.T) {
 						"url":                    "internal-api.my-site.nl",
 					},
 				},
-				Commercetools: &config.CommercetoolsSettings{
+				Commercetools: &commercetools.Settings{
 					ProjectKey:   "my-site",
 					ClientID:     "<client-id>",
 					ClientSecret: "<client-secret>",
 					Scopes:       "manage_api_clients:my-site manage_project:my-site view_api_clients:my-site",
-					ProjectSettings: &config.CommercetoolsProjectSettings{
+					ProjectSettings: &commercetools.ProjectSettings{
 						Languages:  []string{"en-GB", "nl-NL"},
 						Currencies: []string{"GBP", "EUR"},
 						Countries:  []string{"GB", "NL"},
 					},
 				},
-				Components: []config.SiteComponent{
+				Components: []model.SiteComponent{
 					{
 						Name: "your-component",
 						Variables: map[string]any{
@@ -58,13 +59,13 @@ func TestRender(t *testing.T) {
 						},
 					},
 				},
-				AWS: &config.SiteAWS{
+				AWS: &model.SiteAWS{
 					AccountID: "123456789",
 					Region:    "eu-central-1",
 				},
 			},
 		},
-		Components: []config.Component{
+		Components: []model.Component{
 			{
 				Name:         "your-component",
 				Source:       "git::https://github.com/<username>/<your-component>.git//terraform",
@@ -73,9 +74,7 @@ func TestRender(t *testing.T) {
 			},
 		},
 	}
-
 	config.Process(&cfg)
-
 	body, err := Render(&cfg, &cfg.Sites[0])
 	assert.NoError(t, err)
 	assert.NotEmpty(t, body)

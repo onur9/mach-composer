@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,7 +29,7 @@ func TerraformPlan(cfg *config.Config, locations map[string]string, options *Pla
 	}
 }
 
-func TerraformPlanSite(ctx context.Context, cfg *config.Config, site *config.Site, path string, options *PlanOptions) {
+func TerraformPlanSite(ctx context.Context, cfg *config.Config, site *model.Site, path string, options *PlanOptions) {
 	logrus.Debugf("Running terraform plan for site %s", site.Identifier)
 
 	if !options.Reuse {

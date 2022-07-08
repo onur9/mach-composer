@@ -12,12 +12,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var varRegex = regexp.MustCompile(`\${((?:var|env)(?:\.[^\}]+)+)}`)
+var varRegexp = regexp.MustCompile(`\${((?:var|env)(?:\.[^\}]+)+)}`)
 
 type Variables struct {
-	vars      map[string]string
 	Filepath  string
 	Encrypted bool
+
+	vars map[string]string
 }
 
 func NewVariables() *Variables {
@@ -62,20 +63,19 @@ func (v *Variables) Set(key string, value string) {
 
 func loadVariables(filename string) (*Variables, error) {
 	body, err := utils.AFS.ReadFile(filename)
-	vars := NewVariables()
-	vars.Filepath = filename
-
 	if err != nil {
 		panic(err)
 	}
 
+	vars := NewVariables()
+	vars.Filepath = filename
+
 	if yamlIsEncrypted(body) {
 		logrus.Debug("Detected SOPS encryption; decrypting...")
-		body, err = DecryptYAML(filename)
+		body, err = decryptYAML(filename)
 		if err != nil {
 			panic(err)
 		}
-
 		vars.Encrypted = true
 	}
 
@@ -89,12 +89,12 @@ func loadVariables(filename string) (*Variables, error) {
 		delete(dst, "sops")
 	}
 
-	processVariablesYaml(dst, vars.vars, "")
+	processVariablesYAML(dst, vars.vars, "")
 
 	return vars, nil
 }
 
-func processVariablesYaml(in map[string]interface{}, out map[string]string, prefix string) {
+func processVariablesYAML(in map[string]interface{}, out map[string]string, prefix string) {
 	for k, v := range in {
 		var key string
 		if prefix != "" {
@@ -102,19 +102,18 @@ func processVariablesYaml(in map[string]interface{}, out map[string]string, pref
 		} else {
 			key = k
 		}
-
 		switch v := v.(type) {
 		case string:
 			out[key] = v
 		case int:
 			out[key] = fmt.Sprint(v)
 		case map[string]interface{}:
-			processVariablesYaml(v, out, key)
+			processVariablesYAML(v, out, key)
 		}
 	}
 }
 
-// Check if the file is encrypted with sops
+// yamlIsEncrypted checks if the file is encrypted with sops.
 func yamlIsEncrypted(data []byte) bool {
 	dst := make(map[string]interface{})
 	err := yaml.Unmarshal(data, &dst)
@@ -133,14 +132,12 @@ func InterpolateVars(raw *RawConfig, vars *Variables) error {
 	if vars == nil {
 		return errors.New("vars cannot be nil")
 	}
-
 	if err := interpolateNode(&raw.Sites, vars); err != nil {
 		return err
 	}
 	if err := interpolateNode(&raw.Components, vars); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -154,15 +151,12 @@ func interpolateNode(node *yaml.Node, vars *Variables) error {
 		}
 		return nil
 	}
-
 	// Loop through the content if available to update childs
 	for i := range node.Content {
-
 		// Skip over keys
 		if node.Kind == yaml.MappingNode && i%2 == 0 {
 			continue
 		}
-
 		err := interpolateNode(node.Content[i], vars)
 		if err != nil {
 			return err
@@ -172,11 +166,10 @@ func interpolateNode(node *yaml.Node, vars *Variables) error {
 }
 
 func interpolateValue(val string, vars *Variables) (string, bool, error) {
-	matches := varRegex.FindAllStringSubmatch(val, 20)
+	matches := varRegexp.FindAllStringSubmatch(val, 20)
 	if len(matches) == 0 {
 		return val, false, nil
 	}
-
 	for _, match := range matches {
 		replacement, err := vars.Get(match[1])
 		if err != nil {

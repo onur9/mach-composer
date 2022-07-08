@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 	"github.com/labd/mach-composer/internal/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -36,7 +36,7 @@ type gitCommit struct {
 	Message string
 }
 
-func GetLastVersionGit(ctx context.Context, c *config.Component, origin string) (*ChangeSet, error) {
+func GetLastVersionGit(ctx context.Context, c *model.Component, origin string) (*ChangeSet, error) {
 	cacheDir := getGitCachePath(origin)
 	source, err := parseGitSource(c.Source)
 

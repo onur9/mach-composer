@@ -32,7 +32,7 @@ func Load(filename string, varFilename string) (*Config, error) {
 		return nil, err
 	}
 
-	if !ValidateConfig(body, schemaVersion) {
+	if !validateConfigBytes(body, schemaVersion) {
 		return nil, fmt.Errorf("failed to load config %s due to errors", filename)
 	}
 
@@ -46,6 +46,7 @@ func Load(filename string, varFilename string) (*Config, error) {
 	}
 
 	cfg.Filename = filepath.Base(filename)
+
 	Process(cfg)
 
 	return cfg, nil

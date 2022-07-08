@@ -6,6 +6,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/labd/mach-composer/internal/model"
+)
+
+const (
+	AWS   = "aws"
+	Azure = "azure"
 )
 
 func Process(cfg *Config) {
@@ -14,7 +21,6 @@ func Process(cfg *Config) {
 	// resolve_component_definitions(config)
 	ResolveComponentDefinitions(cfg)
 	ResolveSiteConfigs(cfg)
-
 }
 
 func ResolveComponentDefinitions(cfg *Config) {
@@ -23,7 +29,7 @@ func ResolveComponentDefinitions(cfg *Config) {
 	}
 }
 
-func ResolveComponentDefinition(c *Component, cfg *Config) *Component {
+func ResolveComponentDefinition(c *model.Component, cfg *Config) *model.Component {
 	// Terraform needs absolute paths to modules
 	if strings.HasPrefix(c.Source, ".") {
 		if val, err := filepath.Abs(c.Source); err == nil {
@@ -43,7 +49,7 @@ func ResolveComponentDefinition(c *Component, cfg *Config) *Component {
 	}
 
 	if cfg.Global.Cloud == Azure {
-		c.Azure = &ComponentAzureConfig{}
+		c.Azure = &model.ComponentAzureConfig{}
 	}
 
 	if c.Azure != nil && c.Azure.ShortName == "" {
@@ -64,7 +70,7 @@ func ResolveSiteConfigs(cfg *Config) {
 }
 
 func ResolveSiteComponents(cfg *Config) {
-	components := make(map[string]*Component, len(cfg.Components))
+	components := make(map[string]*model.Component, len(cfg.Components))
 	for i, c := range cfg.Components {
 		components[c.Name] = &cfg.Components[i]
 	}
@@ -85,7 +91,7 @@ func ResolveSiteComponents(cfg *Config) {
 
 			if site.Sentry != nil {
 				if c.Sentry == nil {
-					c.Sentry = NewSentryConfig(site.Sentry)
+					c.Sentry = model.NewSentryConfig(site.Sentry)
 				} else {
 					c.Sentry.Merge(site.Sentry)
 				}
@@ -99,7 +105,7 @@ func ResolveSentryConfig(cfg *Config) {
 		for i := range cfg.Sites {
 			s := &cfg.Sites[i]
 			if s.Sentry == nil {
-				s.Sentry = NewSentryConfigFromGlobal(cfg.Global.SentryConfig)
+				s.Sentry = model.NewSentryConfigFromGlobal(cfg.Global.SentryConfig)
 			} else {
 				s.Sentry.MergeGlobal(cfg.Global.SentryConfig)
 			}
@@ -117,7 +123,7 @@ func ResolveAzureConfig(cfg *Config) {
 			s := &cfg.Sites[i]
 
 			if s.Azure == nil {
-				s.Azure = &SiteAzureSettings{}
+				s.Azure = &model.SiteAzureSettings{}
 			}
 			s.Azure.Merge(cfg.Global.Azure)
 			if s.Azure.ResourceGroup != "" {
@@ -133,7 +139,7 @@ func ResolveAzureConfig(cfg *Config) {
 	}
 }
 
-func ResolveComponentEndpoints(site *Site) {
+func ResolveComponentEndpoints(site *model.Site) {
 	site.ResolveEndpoints()
 
 	components := site.EndpointComponents()
@@ -142,16 +148,7 @@ func ResolveComponentEndpoints(site *Site) {
 		if c, ok := components[ep.Key]; ok {
 			ep.Components = c
 		} else {
-			ep.Components = make([]SiteComponent, 0)
+			ep.Components = make([]model.SiteComponent, 0)
 		}
 	}
-}
-
-func stringContains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }

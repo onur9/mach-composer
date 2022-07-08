@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 )
 
 type ApplyOptions struct {
@@ -45,7 +46,7 @@ func TerraformProxy(cfg *config.Config, locations map[string]string, siteName st
 	}
 }
 
-func TerraformApplySite(ctx context.Context, cfg *config.Config, site *config.Site, path string, options *ApplyOptions) {
+func TerraformApplySite(ctx context.Context, cfg *config.Config, site *model.Site, path string, options *ApplyOptions) {
 	if !options.Reuse {
 		RunTerraform(ctx, path, "init")
 	}

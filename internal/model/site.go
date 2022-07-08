@@ -1,13 +1,23 @@
-package config
+package model
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/creasty/defaults"
+	"github.com/labd/mach-composer/internal/model/commercetools"
 	"github.com/labd/mach-composer/internal/utils"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
+
+type SiteAWS struct {
+	AccountID string `yaml:"account_id"`
+	Region    string `yaml:"region"`
+
+	DeployRoleName string            `yaml:"deploy_role_name"`
+	ExtraProviders []AWSProvider     `yaml:"extra_providers"`
+	DefaultTags    map[string]string `yaml:"default_tags"`
+}
 
 // Site contains all configuration needed for a site.
 type Site struct {
@@ -21,9 +31,9 @@ type Site struct {
 	AWS   *SiteAWS           `yaml:"aws,omitempty"`
 	Azure *SiteAzureSettings `yaml:"azure,omitempty"`
 
-	Commercetools *CommercetoolsSettings `yaml:"commercetools"`
-	Amplience     *AmplienceConfig       `yaml:"amplience"`
-	Sentry        *SentryConfig          `yaml:"sentry"`
+	Commercetools *commercetools.Settings `yaml:"commercetools"`
+	Amplience     *AmplienceConfig        `yaml:"amplience"`
+	Sentry        *SentryConfig           `yaml:"sentry"`
 }
 
 func (s *Site) ResolveEndpoints() {
@@ -138,54 +148,65 @@ func (s *Site) HasCDNEndpoint() bool {
 	return false
 }
 
-type SiteComponent struct {
-	Name      string
-	Variables map[string]any
-	Secrets   map[string]any
+// SiteAzureSettings Site-specific Azure settings
+type SiteAzureSettings struct {
+	Frontdoor  *AzureFrontdoorSettings `yaml:"frontdoor"`
+	AlertGroup *AzureAlertGroup        `yaml:"alert_group"`
 
-	Definition *Component
-	Sentry     *SentryConfig `yaml:"sentry"`
+	// Can overwrite values from AzureConfig
+	ResourceGroup  string
+	TenantID       string `yaml:"tenant_id"`
+	SubscriptionID string `yaml:"subscription_id"`
+
+	Region           string
+	ServiceObjectIds map[string]string           `yaml:"service_object_ids"`
+	ServicePlans     map[string]AzureServicePlan `yaml:"service_plans"`
 }
 
-func (sc SiteComponent) HasCloudIntegration() bool {
-	if sc.Definition == nil {
-		log.Fatalf("Component %s was not resolved properly (missing definition)", sc.Name)
+func (a *SiteAzureSettings) Merge(c *GlobalAzureConfig) {
+	if a.Frontdoor == nil {
+		a.Frontdoor = c.Frontdoor
 	}
-	for _, i := range sc.Definition.Integrations {
-		if i == "aws" || i == "azure" {
+	if a.TenantID == "" {
+		a.TenantID = c.TenantID
+	}
+	if a.SubscriptionID == "" {
+		a.SubscriptionID = c.SubscriptionID
+	}
+	if a.Region == "" {
+		a.Region = c.Region
+	}
+
+	if len(a.ServiceObjectIds) == 0 {
+		a.ServiceObjectIds = c.ServiceObjectIds
+	}
+
+	for k, v := range c.ServicePlans {
+		a.ServicePlans[k] = v
+	}
+}
+
+func (a *SiteAzureSettings) ShortRegionName() string {
+	if val, ok := azureRegionDisplayMapShort[a.Region]; ok {
+		return val
+	}
+	logrus.Fatalf("No short name for region %s", a.Region)
+	return ""
+}
+
+func (a *SiteAzureSettings) LongRegionName() string {
+	if val, ok := azureRegionDisplayMapLon[a.Region]; ok {
+		return val
+	}
+	logrus.Fatalf("No long name for region %s", a.Region)
+	return ""
+}
+
+func stringContains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
 			return true
 		}
 	}
 	return false
-
-}
-
-type Endpoint struct {
-	URL   string         `yaml:"url"`
-	Key   string         `yaml:"key"`
-	Zone  string         `yaml:"zone"`
-	AWS   *AWSEndpoint   `yaml:"aws"`
-	Azure *AzureEndpoint `yaml:"azure"`
-
-	Components []SiteComponent
-}
-
-func (e *Endpoint) SetDefaults() {
-	e.URL = StripProtocol(e.URL)
-
-	if e.Zone == "" && e.URL != "" {
-		e.Zone = ZoneFromURL(e.URL)
-	}
-}
-
-func (e *Endpoint) IsRootDomain() bool {
-	return e.URL == e.Zone
-}
-
-func (e Endpoint) Subdomain() string {
-	if e.URL == "" {
-		return ""
-	}
-
-	return SubdomainFromURL(e.URL)
 }

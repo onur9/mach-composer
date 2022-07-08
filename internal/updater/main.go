@@ -8,10 +8,11 @@ import (
 	"strings"
 
 	"github.com/labd/mach-composer/internal/config"
+	"github.com/labd/mach-composer/internal/model"
 )
 
 type WorkerJob struct {
-	component *config.Component
+	component *model.Component
 	cfg       *config.Config
 }
 
@@ -22,7 +23,7 @@ func UpdateFile(ctx context.Context, filename, componentName, componentVersion s
 	}
 
 	// Find the component if defined in the config
-	var component *config.Component
+	var component *model.Component
 	if componentName != "" {
 		for i, c := range cfg.Components {
 			if strings.EqualFold(c.Name, componentName) {
@@ -77,7 +78,7 @@ func UpdateFile(ctx context.Context, filename, componentName, componentVersion s
 	return updateSet, nil
 }
 
-func FindUpdates(ctx context.Context, cfg *config.Config, filename string, component *config.Component) *UpdateSet {
+func FindUpdates(ctx context.Context, cfg *config.Config, filename string, component *model.Component) *UpdateSet {
 	numUpdates := len(cfg.Components)
 	jobs := make(chan WorkerJob, numUpdates)
 	results := make(chan *ChangeSet, numUpdates)
@@ -125,7 +126,7 @@ func FindUpdates(ctx context.Context, cfg *config.Config, filename string, compo
 	return &updates
 }
 
-func FindSpecificUpdate(ctx context.Context, cfg *config.Config, filename string, component *config.Component) *UpdateSet {
+func FindSpecificUpdate(ctx context.Context, cfg *config.Config, filename string, component *model.Component) *UpdateSet {
 	changeSet, err := GetLastVersion(ctx, component, cfg.Filename)
 	if err != nil {
 		panic(err)
@@ -141,7 +142,7 @@ func FindSpecificUpdate(ctx context.Context, cfg *config.Config, filename string
 	return &updates
 }
 
-func GetLastVersion(ctx context.Context, c *config.Component, origin string) (*ChangeSet, error) {
+func GetLastVersion(ctx context.Context, c *model.Component, origin string) (*ChangeSet, error) {
 	if strings.HasPrefix(c.Source, "git:") {
 		return GetLastVersionGit(ctx, c, origin)
 	}

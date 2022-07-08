@@ -12,30 +12,28 @@ import (
 //go:embed schemas/*
 var schemas embed.FS
 
-func ValidateConfig(data []byte, version int) bool {
-
+func validateConfigBytes(data []byte, version int) bool {
 	if version != 1 {
 		fmt.Fprintf(os.Stderr, "Config version %d is unsupported. Only version 1 is supported.\n", version)
 		return false
 	}
-
-	schemaLoader, err := loadSchema(version)
+	body, err := schemas.ReadFile(fmt.Sprintf("schemas/schema-%d.yaml", version))
 	if err != nil {
 		panic(err)
 	}
-
-	docLoader, err := newYamlLoader(data)
+	schemaLoader, err := newRawLoaderFromYAMLBytes(body)
 	if err != nil {
 		panic(err)
 	}
-
+	docLoader, err := newRawLoaderFromYAMLBytes(data)
+	if err != nil {
+		panic(err)
+	}
 	result, err := gojsonschema.Validate(*schemaLoader, *docLoader)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-
-	// Deal with result
 	if !result.Valid() {
 		fmt.Fprintln(os.Stderr, "The config is not valid:")
 		for _, desc := range result.Errors() {
@@ -46,23 +44,11 @@ func ValidateConfig(data []byte, version int) bool {
 	return true
 }
 
-func loadSchema(version int) (*gojsonschema.JSONLoader, error) {
-
-	body, err := schemas.ReadFile(fmt.Sprintf("schemas/schema-%d.yaml", version))
-	if err != nil {
-		return nil, err
-	}
-	return newYamlLoader(body)
-}
-
-func newYamlLoader(data []byte) (*gojsonschema.JSONLoader, error) {
-
+func newRawLoaderFromYAMLBytes(data []byte) (*gojsonschema.JSONLoader, error) {
 	var document map[string]interface{}
 	if err := yaml.Unmarshal(data, &document); err != nil {
 		return nil, err
 	}
 	loader := gojsonschema.NewRawLoader(document)
-
 	return &loader, nil
-
 }
