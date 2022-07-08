@@ -50,7 +50,7 @@ func terraformFunc(ctx context.Context, args []string) error {
 	for _, filename := range generateFlags.fileNames {
 		cfg := configs[filename]
 		paths := allPaths[filename]
-		runner.TerraformProxy(cfg, paths, generateFlags.siteName, args)
+		runner.TerraformProxy(ctx, cfg, paths, generateFlags.siteName, args)
 	}
 
 	return nil

@@ -15,16 +15,12 @@ type PlanOptions struct {
 	Site       string
 }
 
-func TerraformPlan(cfg *config.Config, locations map[string]string, options *PlanOptions) {
-	ctx := context.Background()
-
+func TerraformPlan(ctx context.Context, cfg *config.Config, locations map[string]string, options *PlanOptions) {
 	for i := range cfg.Sites {
 		site := cfg.Sites[i]
-
 		if options.Site != "" && site.Identifier != options.Site {
 			continue
 		}
-
 		TerraformPlanSite(ctx, cfg, &site, locations[site.Identifier], options)
 	}
 }

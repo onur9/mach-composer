@@ -60,7 +60,7 @@ func planFunc(ctx context.Context, args []string) error {
 	for _, filename := range generateFlags.fileNames {
 		cfg := configs[filename]
 		paths := allPaths[filename]
-		runner.TerraformPlan(cfg, paths, options)
+		runner.TerraformPlan(ctx, cfg, paths, options)
 	}
 
 	return nil

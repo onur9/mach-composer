@@ -72,7 +72,7 @@ func applyFunc(ctx context.Context, args []string) error {
 	for _, filename := range generateFlags.fileNames {
 		cfg := configs[filename]
 		paths := allPaths[filename]
-		runner.TerraformApply(cfg, paths, options)
+		runner.TerraformApply(ctx, cfg, paths, options)
 	}
 
 	return nil

@@ -18,30 +18,22 @@ type ApplyOptions struct {
 	Site        string
 }
 
-func TerraformApply(cfg *config.Config, locations map[string]string, options *ApplyOptions) {
-	ctx := context.Background()
-
+func TerraformApply(ctx context.Context, cfg *config.Config, locations map[string]string, options *ApplyOptions) {
 	for i := range cfg.Sites {
 		site := cfg.Sites[i]
-
 		if options.Site != "" && site.Identifier != options.Site {
 			continue
 		}
-
 		TerraformApplySite(ctx, cfg, &site, locations[site.Identifier], options)
 	}
 }
 
-func TerraformProxy(cfg *config.Config, locations map[string]string, siteName string, cmd []string) {
-	ctx := context.Background()
-
+func TerraformProxy(ctx context.Context, cfg *config.Config, locations map[string]string, siteName string, cmd []string) {
 	for i := range cfg.Sites {
 		site := cfg.Sites[i]
-
 		if siteName != "" && site.Identifier != siteName {
 			continue
 		}
-
 		RunTerraform(ctx, locations[site.Identifier], cmd...)
 	}
 }
@@ -56,7 +48,6 @@ func TerraformApplySite(ctx context.Context, cfg *config.Config, site *model.Sit
 	if options.Destroy {
 		cmd = append(cmd, "-destroy")
 	}
-
 	if options.AutoApprove {
 		cmd = append(cmd, "-auto-approve")
 	}

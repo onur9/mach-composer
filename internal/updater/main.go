@@ -151,7 +151,7 @@ func GetLastVersion(ctx context.Context, c *model.Component, origin string) (*Ch
 
 func WriteUpdates(ctx context.Context, cfg *config.Config, updates *UpdateSet) {
 	if cfg.IsEncrypted {
-		SopsFileWriter(cfg, updates)
+		SopsFileWriter(ctx, cfg, updates)
 	} else {
 		MachFileWriter(updates)
 	}
